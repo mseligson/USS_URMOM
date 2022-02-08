@@ -22,7 +22,7 @@ const float R1 = 10000; // Value of resistor
 int Vo;
 float R2, T;
 
-// Steinhart-Hart Coefficients
+// Steinhart-Hart Coefficients for a 10k ohm thermistor
 const float A = 0.001125308852122;
 const float B = 0.000234711863267; 
 const float C = 0.000000085663516;
