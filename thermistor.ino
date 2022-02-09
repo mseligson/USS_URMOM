@@ -1,6 +1,5 @@
 /* Thermistor Reading
-Reads voltage difference across thermsistor (~125k ohm at room temp) 
-and 100k ohm resistor connected in series
+Reads voltage difference across thermsistor and 10k ohm resistor
 
 Using equations:
 Vo = Vin * (R2/(R1+R2))
@@ -20,12 +19,12 @@ const int THERM_PIN = 0; // Thermsistor is connected to this pin
 const float R1 = 10000; // Value of resistor
 
 int Vo;
-float R2, T;
+float R2, temperature;
 
-// Steinhart-Hart Coefficients for a 10k ohm thermistor
-const float A = 0.001125308852122;
-const float B = 0.000234711863267; 
-const float C = 0.000000085663516;
+// Steinhart-Hart Coefficients
+const float SH_A = 0.001125308852122;
+const float SH_B = 0.000234711863267; 
+const float SH_C = 0.000000085663516;
 
 // Setup
 void setup() {
@@ -34,21 +33,20 @@ void setup() {
 
 // Read and print temperature
 void loop() {
+  // Read voltage difference to calculate thermistor resistance
   Vo = analogRead(THERM_PIN);
   R2 = R1 * (1023.0 / (float)Vo - 1.0); // TODO Changing / to * causes it to increase appropriately but reading is still off
   float logR2 = log(R2);
-  Serial.println(R2);
 
-  T = (1.0000 / (A + B*logR2 + C*logR2*logR2*logR2));
-  Serial.println(T);
-  T -= 273.15;
-  Serial.println(T);
-  T = (T * 9.0)/ 5.0 + 32.0; 
+  // Calculate temperature using Steinhart-Hart equation and coefficients
+  temperature = (1.0000 / (SH_A + SH_B*logR2 + SH_C*logR2*logR2*logR2));
+  temperature -= 273.15; // Temperature celcius
+  // temperature = (temperature * 9.0)/ 5.0 + 32.0; // Celcius to fahrenheit
 
+  // Print temperature
   Serial.print("Temperature: "); 
-  Serial.print(T);
-  Serial.println(" F"); 
+  Serial.print(temperature);
+  Serial.println(" C"); 
 
-  delay(5 * SEC);
-
+  delay(DELAY * SEC); // Delay in seconds between temperature readings
 }
